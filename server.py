@@ -3,6 +3,7 @@ from urllib.parse import urlparse, parse_qs
 import os
 from cowpy import cow
 import json
+from textwrap import dedent
 
 # os.environ is like process.env
 
@@ -11,7 +12,6 @@ class SimpleHTTPRequestHandler(BaseHTTPRequestHandler):
     def do_GET(self):
         parsed_path = urlparse(self.path)
         parsed_qs = parse_qs(parsed_path.query)
-
 
         # set a status code
         # set any headers
@@ -23,7 +23,24 @@ class SimpleHTTPRequestHandler(BaseHTTPRequestHandler):
             self.send_response(200)
             self.send_header('Content-Type', 'text/html')
             self.end_headers()
-            self.wfile.write(b'<html><body><h1>Hello world</h1></body></html>')
+            html = dedent('''
+        <html>
+        <head>
+            <title> cowsay </title>
+        </head>
+        <body>
+            <header>
+                <nav>
+                <ul>
+                    <li><a href="/cow">cowsay</a></li>
+                </ul>
+                </nav>
+            <header>
+            <main>
+            </main>
+        </body>
+        </html>''')
+            self.wfile.write(html.encode())
             return
 
         elif parsed_path.path == '/cow':
