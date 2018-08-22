@@ -19,6 +19,6 @@ GitHub
  ## Change Log
  08-21-2018 17:50 Basic Functionality Done
 
- 08-21-2018 10:30 Added more tests
+ 08-21-2018 22:30 Added more tests
  ## License
 This project is licensed under the MIT license
