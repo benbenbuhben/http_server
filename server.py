@@ -1,6 +1,8 @@
 from http.server import BaseHTTPRequestHandler, HTTPServer
 from urllib.parse import urlparse, parse_qs
 import os
+from cowpy import cow
+import json
 
 # os.environ is like process.env
 
@@ -10,26 +12,70 @@ class SimpleHTTPRequestHandler(BaseHTTPRequestHandler):
         parsed_path = urlparse(self.path)
         parsed_qs = parse_qs(parsed_path.query)
 
+
         # set a status code
         # set any headers
         # set any body data on the response
         # end headers
 
         if parsed_path.path == '/':
+
             self.send_response(200)
             self.send_header('Content-Type', 'text/html')
             self.end_headers()
             self.wfile.write(b'<html><body><h1>Hello world</h1></body></html>')
             return
 
-        elif parsed_path.path == '/banana':
-            pass
-
-        self.send_response(404)
-        self.end_headers()
+        elif parsed_path.path == '/cow':
+            try:
+                buttcow = cow.Stegosaurus()
+                msg = buttcow.milk(parsed_qs['msg'][0])
+                self.send_response(200)
+                self.send_header('Content-Type', 'text/html')
+                self.end_headers()
+                self.wfile.write(msg.encode())
+                return
+            except KeyError:
+                self.send400()
+        else:
+            self.send_response(404)
+            self.end_headers()
+            buttcow = cow.Ghostbusters()
+            msg = buttcow.milk('404 ERROR!!! NOT FOUND!!!!')
+            self.wfile.write(msg.encode())
 
     def do_POST(self):
-        pass
+        parsed_path = urlparse(self.path)
+        parsed_qs = parse_qs(parsed_path.query)
+
+        if parsed_path.path == '/cow':
+
+            try:
+                buttcow = cow.Stegosaurus()
+                msg = buttcow.milk(parsed_qs['msg'][0])
+                msg_json = json.dumps({'content': msg})
+                self.send_response(200)
+                self.send_header('Content-Type', 'application/json')
+                self.end_headers()
+                print(msg_json)
+                self.wfile.write(msg_json.encode())
+                return
+
+            except KeyError:
+                self.send400()
+        else:
+            self.send_response(404)
+            self.end_headers()
+            buttcow = cow.Ghostbusters()
+            msg = buttcow.milk('404 ERROR!!! NOT FOUND!!!!')
+            self.wfile.write(msg.encode())
+
+    def send400(self):
+        self.send_response(400)
+        self.end_headers()
+        buttcow = cow.Sodomized()
+        msg = buttcow.milk('400 ERROR!!! BAD REQUEST!!!')
+        self.wfile.write(msg.encode())
 
 
 def create_server():
@@ -43,8 +89,9 @@ def run_forever():
     server = create_server()
 
     try:
-        server.serve_forever()
         print(f'Server running on {os.environ["PORT"]}')
+        server.serve_forever()
+
 
     except KeyboardInterrupt:
         server.shutdown()
